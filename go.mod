@@ -1,4 +1,4 @@
-module github.com/renatopp/cli-tools/download
+module github.com/renatopp/go-download
 
 go 1.26.3
 

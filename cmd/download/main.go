@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/renatopp/cli-tools/download/downloader"
 	"github.com/renatopp/go-cli"
+	"github.com/renatopp/go-download/downloader"
 	"github.com/renatopp/x/fmtx"
 	"github.com/renatopp/x/strx"
 )
