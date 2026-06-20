@@ -90,6 +90,23 @@ func normalizeConfig(cfg Config) (Config, error) {
 	return cfg, nil
 }
 
+func normalizeURL(raw string) string {
+	if strx.Contains(raw, "://") {
+		return raw
+	}
+	host := raw
+	if idx := strx.IndexOf(host, "/"); idx >= 0 {
+		host = host[:idx]
+	}
+	if idx := strx.IndexOf(host, ":"); idx >= 0 {
+		host = host[:idx]
+	}
+	if host == "localhost" || host == "127.0.0.1" {
+		return "http://" + raw
+	}
+	return "https://" + raw
+}
+
 func buildJobs(cfg Config, urls []string) ([]job, error) {
 	if cfg.Output != "" && len(urls) > 1 {
 		return nil, fmtx.Error("--output supports only a single URL")
@@ -98,16 +115,18 @@ func buildJobs(cfg Config, urls []string) ([]job, error) {
 		return nil, fmtx.Error("-o - supports only a single URL")
 	}
 	if cfg.Pipe {
-		if _, err := neturl.ParseRequestURI(urls[0]); err != nil {
-			return nil, fmtx.Error("invalid URL %q: %w", urls[0], err)
+		u := normalizeURL(urls[0])
+		if _, err := neturl.ParseRequestURI(u); err != nil {
+			return nil, fmtx.Error("invalid URL %q: %w", u, err)
 		}
-		return []job{{index: 0, url: urls[0], path: ""}}, nil
+		return []job{{index: 0, url: u, path: ""}}, nil
 	}
 
 	jobs := make([]job, 0, len(urls))
 	pathSet := map[string]struct{}{}
 
 	for i, u := range urls {
+		u = normalizeURL(u)
 		if _, err := neturl.ParseRequestURI(u); err != nil {
 			return nil, fmtx.Error("invalid URL %q: %w", u, err)
 		}
