@@ -33,6 +33,7 @@ type Config struct {
 	NoAtomic   bool
 	NoResume   bool
 	NoProgress bool
+	Pipe       bool
 	Statusf    func(format string, args ...any)
 }
 
@@ -92,6 +93,15 @@ func normalizeConfig(cfg Config) (Config, error) {
 func buildJobs(cfg Config, urls []string) ([]job, error) {
 	if cfg.Output != "" && len(urls) > 1 {
 		return nil, fmtx.Error("--output supports only a single URL")
+	}
+	if cfg.Pipe && len(urls) > 1 {
+		return nil, fmtx.Error("-o - supports only a single URL")
+	}
+	if cfg.Pipe {
+		if _, err := neturl.ParseRequestURI(urls[0]); err != nil {
+			return nil, fmtx.Error("invalid URL %q: %w", urls[0], err)
+		}
+		return []job{{index: 0, url: urls[0], path: ""}}, nil
 	}
 
 	jobs := make([]job, 0, len(urls))
@@ -279,6 +289,28 @@ func downloadWithRetries(ctx context.Context, client *http.Client, cfg Config, j
 }
 
 func downloadOnce(ctx context.Context, client *http.Client, cfg Config, j job, outMu *sync.Mutex, bar progressbar.PB) error {
+	if cfg.Pipe {
+		req, err := http.NewRequestWithContext(ctx, cfg.Method, j.url, nil)
+		if err != nil {
+			return fmtx.Error("failed creating request: %w", err)
+		}
+		for key, values := range cfg.Headers {
+			for _, value := range values {
+				req.Header.Add(key, value)
+			}
+		}
+		res, err := client.Do(req)
+		if err != nil {
+			return fmtx.Error("request failed: %w", err)
+		}
+		defer res.Body.Close()
+		if res.StatusCode < 200 || res.StatusCode >= 300 {
+			return fmtx.Error("unexpected status %d", res.StatusCode)
+		}
+		_, err = io.Copy(os.Stdout, res.Body)
+		return err
+	}
+
 	if err := fsx.CreateDir(fsx.GetPathParent(j.path)); err != nil {
 		return fmtx.Error("failed creating output directory for %q: %w", j.path, err)
 	}

@@ -48,12 +48,18 @@ func main() {
 		return
 	}
 
+	output := outputFlag.Value()
+	pipe := output == "-"
+	if pipe {
+		output = ""
+	}
+
 	cfg := downloader.Config{
 		Urls:       urls,
-		Output:     outputFlag.Value(),
+		Output:     output,
 		Dir:        dirFlag.Value(),
 		Method:     methodFlag.Value(),
-		Quiet:      quietFlag.Value(),
+		Quiet:      quietFlag.Value() || pipe,
 		Checksum:   checksumFlag.Value(),
 		Parallel:   parallelFlag.Value(),
 		FailFast:   failFastFlag.Value(),
@@ -61,7 +67,8 @@ func main() {
 		Headers:    headers,
 		NoAtomic:   noAtomicFlag.Value(),
 		NoResume:   noResumeFlag.Value(),
-		NoProgress: noProgressFlag.Value(),
+		NoProgress: noProgressFlag.Value() || pipe,
+		Pipe:       pipe,
 		Statusf: func(format string, args ...any) {
 			cli.Print(format+"\n", args...)
 		},

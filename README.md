@@ -61,13 +61,13 @@ Examples:
 
   `download https://example.com/file1.txt https://example.com/file1.txt`
 
-- Download a file with a custom name and path:
-
-  `download -o downloaded.txt -d /path/to/dir https://example.com/file.txt`
-
 - Download files from file:
 
   `cat urls.txt | download`
+
+- Downloading file piping to stdout
+
+  `download -o - https://example.com/file.txt | cat`
 
 ## Library Usage
 
