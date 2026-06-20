@@ -1,3 +1,7 @@
+# 0.1.3 (2026-06-19)
+
+- Renaming `--no-override` flag to `--no-overwrite`.
+
 # 0.1.2 (2026-06-19)
 
 - Add support for downloading to stdout via `-o -`.

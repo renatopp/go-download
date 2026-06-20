@@ -29,7 +29,7 @@ func main() {
 	noAtomicFlag := cli.FlagBool("no-atomic", "", "Disable atomic write (write directly to output).").WithDefault(false)
 	noResumeFlag := cli.FlagBool("no-resume", "", "Disable resumable downloads.").WithDefault(false)
 	noProgressFlag := cli.FlagBool("no-progress", "", "Disable progress output.").WithDefault(false)
-	noOverrideFlag := cli.FlagBool("no-override", "", "Skip download if the output file already exists.").WithDefault(false)
+	noOverwriteFlag := cli.FlagBool("no-overwrite", "", "Skip download if the output file already exists.").WithDefault(false)
 	urlsPos := cli.PosString("urls", "URLs to download.").AsVariadic()
 	cli.Parse()
 
@@ -56,21 +56,21 @@ func main() {
 	}
 
 	cfg := downloader.Config{
-		Urls:       urls,
-		Output:     output,
-		Dir:        dirFlag.Value(),
-		Method:     methodFlag.Value(),
-		Quiet:      quietFlag.Value() || pipe,
-		Checksum:   checksumFlag.Value(),
-		Parallel:   parallelFlag.Value(),
-		FailFast:   failFastFlag.Value(),
-		Retries:    retriesFlag.Value(),
-		Headers:    headers,
-		NoAtomic:   noAtomicFlag.Value(),
-		NoResume:   noResumeFlag.Value(),
-		NoProgress: noProgressFlag.Value() || pipe,
-		NoOverride: noOverrideFlag.Value(),
-		Pipe:       pipe,
+		Urls:        urls,
+		Output:      output,
+		Dir:         dirFlag.Value(),
+		Method:      methodFlag.Value(),
+		Quiet:       quietFlag.Value() || pipe,
+		Checksum:    checksumFlag.Value(),
+		Parallel:    parallelFlag.Value(),
+		FailFast:    failFastFlag.Value(),
+		Retries:     retriesFlag.Value(),
+		Headers:     headers,
+		NoAtomic:    noAtomicFlag.Value(),
+		NoResume:    noResumeFlag.Value(),
+		NoProgress:  noProgressFlag.Value() || pipe,
+		NoOverwrite: noOverwriteFlag.Value(),
+		Pipe:        pipe,
 		Statusf: func(format string, args ...any) {
 			cli.Print(format+"\n", args...)
 		},

@@ -20,22 +20,22 @@ import (
 )
 
 type Config struct {
-	Urls       []string
-	Output     string
-	Dir        string
-	Method     string
-	Quiet      bool
-	Checksum   string
-	Parallel   int
-	FailFast   bool
-	Retries    int
-	Headers    http.Header
-	NoAtomic   bool
-	NoResume   bool
-	NoProgress bool
-	NoOverride bool
-	Pipe       bool
-	Statusf    func(format string, args ...any)
+	Urls        []string
+	Output      string
+	Dir         string
+	Method      string
+	Quiet       bool
+	Checksum    string
+	Parallel    int
+	FailFast    bool
+	Retries     int
+	Headers     http.Header
+	NoAtomic    bool
+	NoResume    bool
+	NoProgress  bool
+	NoOverwrite bool
+	Pipe        bool
+	Statusf     func(format string, args ...any)
 }
 
 type job struct {
@@ -335,7 +335,7 @@ func downloadOnce(ctx context.Context, client *http.Client, cfg Config, j job, o
 		return fmtx.Error("failed creating output directory for %q: %w", j.path, err)
 	}
 
-	if cfg.NoOverride {
+	if cfg.NoOverwrite {
 		if _, err := fsx.Size(j.path); err == nil {
 			printStatusf(cfg.Statusf, outMu, "Skipping %s (already exists)", j.path)
 			return nil
