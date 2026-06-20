@@ -2,6 +2,7 @@
 
 - Add support for downloading to stdout via `-o -`.
 - Add support for urls without protocols, assuming https by default (except for localhost 127.0.0.1).
+- Add `--no-override` flag to skip download if the output file already exists.
 
 # 0.1.1 (2026-06-19)
 

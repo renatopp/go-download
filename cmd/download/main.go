@@ -17,7 +17,7 @@ func main() {
 	cli.Description("Download one or more files from URLs.")
 	cli.AutoHelp(true)
 
-	outputFlag := cli.FlagString("output", "o", "Output file path (single URL only).").WithDefault("")
+	outputFlag := cli.FlagString("output", "o", "Output file path, use - to write to stdout (single URL only).").WithDefault("")
 	dirFlag := cli.FlagString("dir", "d", "Output directory.").WithDefault(".")
 	methodFlag := cli.FlagString("method", "m", "HTTP method to use.").WithDefault("GET")
 	quietFlag := cli.FlagBool("quiet", "q", "Quiet mode (disable progress and verifications).").WithDefault(false)
@@ -29,6 +29,7 @@ func main() {
 	noAtomicFlag := cli.FlagBool("no-atomic", "", "Disable atomic write (write directly to output).").WithDefault(false)
 	noResumeFlag := cli.FlagBool("no-resume", "", "Disable resumable downloads.").WithDefault(false)
 	noProgressFlag := cli.FlagBool("no-progress", "", "Disable progress output.").WithDefault(false)
+	noOverrideFlag := cli.FlagBool("no-override", "", "Skip download if the output file already exists.").WithDefault(false)
 	urlsPos := cli.PosString("urls", "URLs to download.").AsVariadic()
 	cli.Parse()
 
@@ -68,6 +69,7 @@ func main() {
 		NoAtomic:   noAtomicFlag.Value(),
 		NoResume:   noResumeFlag.Value(),
 		NoProgress: noProgressFlag.Value() || pipe,
+		NoOverride: noOverrideFlag.Value(),
 		Pipe:       pipe,
 		Statusf: func(format string, args ...any) {
 			cli.Print(format+"\n", args...)

@@ -33,6 +33,7 @@ type Config struct {
 	NoAtomic   bool
 	NoResume   bool
 	NoProgress bool
+	NoOverride bool
 	Pipe       bool
 	Statusf    func(format string, args ...any)
 }
@@ -334,6 +335,13 @@ func downloadOnce(ctx context.Context, client *http.Client, cfg Config, j job, o
 		return fmtx.Error("failed creating output directory for %q: %w", j.path, err)
 	}
 
+	if cfg.NoOverride {
+		if _, err := fsx.Size(j.path); err == nil {
+			printStatusf(cfg.Statusf, outMu, "Skipping %s (already exists)", j.path)
+			return nil
+		}
+	}
+
 	tempPath := j.path
 	if !cfg.NoAtomic {
 		tempPath = j.path + ".part"
@@ -500,8 +508,10 @@ func printStatusf(statusf func(format string, args ...any), outMu *sync.Mutex, f
 		return
 	}
 
-	outMu.Lock()
-	defer outMu.Unlock()
+	if outMu != nil {
+		outMu.Lock()
+		defer outMu.Unlock()
+	}
 	statusf(format, args...)
 }
 

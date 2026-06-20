@@ -33,7 +33,7 @@ Then, import the package `github.com/renatopp/go-download` in your Go code.
 Usage: download [options] [<urls>]
 
 Options:
-  -o, --output      (default=) Output file path (single URL only).
+  -o, --output      (default=) Output file path, use - to write to stdout (single URL only).
   -d, --dir         (default=.) Output directory.
   -m, --method      (default=GET) HTTP method to use.
   -q, --quiet       (default=false) Quiet mode (disable progress and verifications).
@@ -45,6 +45,7 @@ Options:
   --no-atomic       (default=false) Disable atomic write (write directly to output).
   --no-resume       (default=false) Disable resumable downloads.
   --no-progress     (default=false) Disable progress output.
+  --no-override     (default=false) Skip download if the output file already exists.
   -h, --help        Show help message
 
 Arguments:
